@@ -43,6 +43,14 @@ function flickrapi_admin_settings() {
     '#default_value' => variable_get('flickrapi_cache_duration', 3600),
     '#description' => t("The refresh interval indicating how often you want to check cached Flickr API calls are up to date."),
   );
+
+  $form['flickrcachepath'] = array(
+    '#title' => t('Flickr Cache Path'),
+    '#required' => TRUE,
+    '#description' => t('Location on server file system where results of Flickr API calls can be cached.'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('flickrcachepath', '/tmp'),
+  );
   
   $form['#validate'][] = 'flickrapi_admin_settings_validate';
   return system_settings_form($form);
