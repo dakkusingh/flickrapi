@@ -2,4 +2,5 @@
 name = FlickrAPI
 description = Use Flickr APIs with Drupal using phpFlickr
 package = Flickr
-core = 6.x
+files[] = flickrapi.module
+core = 7.x
