@@ -96,7 +96,7 @@ function flickrapi_phpFlickr() {
   if (!$api_key) {
     drupal_set_message(t("Flickr API key not set"), 'error');
     if (user_access('Administer global flickr api settings')) {
-      drupal_set_message(t('Goto <a href="@link">admin/config/flickrapi</a> to configure the Flickr API settings', array('@link' => url('admin/config/flickrapi'))));
+      drupal_set_message(t('Go to !link to configure the Flickr API settings', array('!link' => l('admin/config/media/flickrapi', 'admin/config/media/flickrapi'))));
     }
   }
   $flickr = new phpFlickr($api_key);
