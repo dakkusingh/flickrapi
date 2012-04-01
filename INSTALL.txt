@@ -6,6 +6,6 @@ INSTALLATION:
 
 2) Enable the module.
 
-3) Go to Administer/Site configuration/Flickr API Settings
+3) Go to admin/config/media/flickrapi
 
 4) Enter your API Key and optionally your API Shared Secret. See http://www.flickr.com/services/api to register for a key.  This module serves as a helper for other Drupal Flickr modules, so whether or not the Shared Secret is needed is up to other modules.
