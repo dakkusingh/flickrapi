@@ -1,6 +1,8 @@
-name = FlickrAPI
-description = Use Flickr APIs with Drupal using phpFlickr
+name = Flickr API
+description = Use Flickr APIs with Drupal using phpFlickr.
 package = Media
 core = 7.x
+
+files[] = phpFlickr/phpFlickr.php
 
 configure = admin/config/media/flickrapi
