@@ -60,17 +60,6 @@ function flickrapi_admin_settings() {
     '#description' => t("API key's secret from Flickr."),
   );
 
-  $form['flickrapi_default_nsid'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Flickr User ID'),
-    '#required' => FALSE,
-    '#default_value' => variable_get('flickrapi_default_nsid', ''),
-    '#description' => t(
-      'The default Flickr User ID to be used when no user is specified. Tip: use !idGettr to find yours.',
-      array('!idGettr' => l(t('idGettr.com'), 'http://idgettr.com/'))
-    ),
-  );
-
   $times = array(900, 1800, 2700, 3600, 7200, 10800, 14400, 18000, 21600, 43200, 86400);
   $ageoptions = drupal_map_assoc($times, 'format_interval');
   $form['flickrapi_cache_duration'] = array(
@@ -99,7 +88,6 @@ function flickrapi_admin_settings() {
 function flickrapi_admin_settings_validate($form, &$form_state) {
   $key = trim($form_state['values']['flickrapi_api_key']);
   $secret = trim($form_state['values']['flickrapi_api_secret']);
-  $nsid = trim($form_state['values']['flickrapi_default_nsid']);
   $cache_dir = $form_state['values']['flickrapi_cache_path'];
 
   if ($key && (preg_match('/^[A-Fa-f\d]{32}$/', $key) != 1)) {
@@ -108,10 +96,6 @@ function flickrapi_admin_settings_validate($form, &$form_state) {
 
   if ($secret && (preg_match('/^[A-Fa-f\d]{16}$/', $secret) != 1)) {
     form_set_error('flickrapi_api_secret', t('This does not appear to be a Flickr API secret.'));
-  }
-
-  if (!flickrapi_is_nsid($nsid)) {
-    form_set_error('flickrapi_default_nsid', t('This does not appear to be a valid Flickr User ID.'));
   }
 
   if (!file_prepare_directory($cache_dir)) {
