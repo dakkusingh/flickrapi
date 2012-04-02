@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * @file
+ *
+ * FlickAPI integration module.
+ */
+
+/**
  * Implements hook_menu().
  */
 function flickrapi_menu() {
@@ -8,10 +14,10 @@ function flickrapi_menu() {
   $items['admin/config/media/flickrapi'] = array(
     'title' => 'Flickr API Settings',
     'description' => 'Configure Flickr API credentials.',
-    'access arguments' => array('configure_flickr_api'),
+    'access arguments' => array('configure flickr api'),
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('flickrapi_admin_settings')
+    'page arguments' => array('flickrapi_admin_settings'),
   );
   return $items;
 }
@@ -20,14 +26,17 @@ function flickrapi_menu() {
  * Implements hook_permission().
  */
 function flickrapi_permission() {
-  return array('configure_flickr_api' =>
+  return array('configure flickr api' =>
     array(
       'title' => t('Configure Flickr API'),
       'description' => t('Set API keys and cache times for flickr queries'),
-    )
+    ),
   );
 }
 
+/**
+ * Admin settings form
+ */
 function flickrapi_admin_settings() {
   $form = array();
 
@@ -77,6 +86,9 @@ function flickrapi_admin_settings() {
   return system_settings_form($form);
 }
 
+/**
+ * Validator for the admin settings form.
+ */
 function flickrapi_admin_settings_validate($form, &$form_state) {
   $key = trim($form_state['values']['flickrapi_api_key']);
   $sec = trim($form_state['values']['flickrapi_api_secret']);
