@@ -17,3 +17,11 @@ function flickrapi_update_7000() {
     ->condition('permission', 'configure_flickr_api')
     ->execute();
 }
+
+/**
+ * Rename the variable 'flickrcachepath' to 'flickrapi_cache_path'
+ */
+function flickrapi_update_7001() {
+  variable_set('flickrapi_cache_path', variable_get('flickrcachepath', '/tmp'));
+  variable_del('flickrcachepath');
+}
