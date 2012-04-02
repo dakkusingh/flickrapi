@@ -81,8 +81,8 @@ function flickrapi_admin_settings_validate($form, &$form_state) {
     form_set_error('flickrapi_api_secret', t('This does not appear to be a Flickr API secret.'));
   }
 
-  if(!is_dir($cache_dir)) {
-    form_set_error('flickrapi_cache_path', t('Folder does not exist.'));
+  if(!is_dir($cache_dir) || !is_writable($cache_dir)) {
+    form_set_error('flickrapi_cache_path', t('Folder does not exist or is not writable.'));
   }
 }
 
