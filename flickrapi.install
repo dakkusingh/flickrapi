@@ -25,3 +25,15 @@ function flickrapi_update_7001() {
   variable_set('flickrapi_cache_path', variable_get('flickrcachepath', '/tmp'));
   variable_del('flickrcachepath');
 }
+
+/**
+ * Implements hook_uninstall().
+ * Clean up old variables.
+ */
+function flickrapi_uninstall() {
+  variable_del('flickrapi_cache_path');
+  variable_del('flickrapi_api_key');
+  variable_del('flickrapi_api_secret');
+  variable_del('flickrapi_cache_duration');
+  variable_del('flickrapi_default_nsid');
+}
