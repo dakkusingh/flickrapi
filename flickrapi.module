@@ -8,12 +8,21 @@ function flickrapi_menu() {
   $items['admin/settings/flickrapi'] = array(
     'title' => 'Flickr API Settings',
     'description' => 'Configure Flickr API credentials.',
-    'access arguments' => array('administer site configuration'),
+    'access arguments' => array('configure flickr api'),
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrapi_admin_settings')
   );
   return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function flickrapi_perm() {
+  return array(
+    'configure flickr api',
+  );
 }
 
 function flickrapi_admin_settings() {
@@ -89,7 +98,7 @@ function flickrapi_phpFlickr() {
   $api_secret = variable_get('flickrapi_api_secret', '');
   if (!$api_key) {
     drupal_set_message(t("Flickr API key not set"), 'error');
-    if (user_access('Administer global flickr api settings')) {
+    if (user_access('configure flickr api')) {
       drupal_set_message(t("Goto !link to configure the Flickr API settings", array('!link' => l('admin/settings/flickrapi', 'admin/settings/flickrapi'))));
     }
   }
