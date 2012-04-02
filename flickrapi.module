@@ -87,13 +87,11 @@ function flickrapi_admin_settings_validate($form, &$form_state) {
 }
 
 /**
- * returns the phpFlickr object.
+ * Returns the phpFlickr object.
  * If we need to change anything, such as making the cache configuration,
  * then it'll all be done here.
  */
 function flickrapi_phpFlickr() {
-  module_load_include('php', 'flickrapi', 'phpFlickr/phpFlickr');
-
   $api_key = variable_get('flickrapi_api_key', '');
   $api_secret = variable_get('flickrapi_api_secret', '');
   if (!$api_key) {
@@ -110,7 +108,7 @@ function flickrapi_phpFlickr() {
 /**
  * Tries to match an 'identifier' onto a flickr nsid
  *
- * This function will first see whether $identifier is allready
+ * This function will first see whether $identifier is already
  * a nsid (format check only, no api call).  If it is not and the
  * identifier has the format of an email, an api call will be made to
  * check whether there is an nsid for that email.  If this is not the
@@ -120,14 +118,14 @@ function flickrapi_phpFlickr() {
  * If none of these succees, the result will be false
  *
  * @param $identifier
- *   identifier to find an nsid for
+ *   String identifier to find an nsid for
  *
  * @return
  *   valid nsid or false if none can be found
  */
 function flickrapi_get_user_nsid($identifier) {
   if (flickrapi_is_nsid($identifier)) {
-    //identifier is an NSID
+    // Identifier is an NSID.
     return $identifier;
   }
   $f = flickrapi_phpFlickr();
