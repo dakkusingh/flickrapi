@@ -114,8 +114,8 @@ function flickrapi_admin_settings_validate($form, &$form_state) {
     form_set_error('flickrapi_default_nsid', t('This does not appear to be a valid Flickr User ID.'));
   }
 
-  if (!is_dir($cache_dir)) {
-    form_set_error('flickrapi_cache_path', t('Folder does not exist.'));
+  if (!file_prepare_directory($cache_dir)) {
+    form_set_error('flickrapi_cache_path', t('Folder does not exist or it is not writable.'));
   }
 }
 
