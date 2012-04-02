@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Update functions for the FlickrAPI module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ * Clean up old variables.
+ */
+function flickrapi_uninstall() {
+  variable_del('flickrapi_cache_path');
+  variable_del('flickrapi_api_key');
+  variable_del('flickrapi_api_secret');
+  variable_del('flickrapi_cache_duration');
+  variable_del('flickrapi_default_nsid');
+}
