@@ -16,3 +16,11 @@ function flickrapi_uninstall() {
   variable_del('flickrapi_cache_duration');
   variable_del('flickrapi_default_nsid');
 }
+
+/**
+ * Rename the variable 'flickrcachepath' to 'flickrapi_cache_path'
+ */
+function flickrapi_update_6100() {
+  variable_set('flickrapi_cache_path', variable_get('flickrcachepath', '/tmp'));
+  variable_del('flickrcachepath');
+}
