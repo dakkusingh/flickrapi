@@ -2,7 +2,6 @@
 
 /**
  * @file
- *
  * FlickAPI integration module.
  */
 
@@ -26,8 +25,8 @@ function flickrapi_menu() {
  * Implements hook_permission().
  */
 function flickrapi_permission() {
-  return array('configure flickr api' =>
-    array(
+  return array(
+    'configure flickr api' => array(
       'title' => t('Configure Flickr API'),
       'description' => t('Set API keys and cache times for flickr queries'),
     ),
@@ -61,7 +60,10 @@ function flickrapi_admin_settings() {
     '#title' => t('Flickr User ID'),
     '#required' => FALSE,
     '#default_value' => variable_get('flickrapi_default_nsid', ''),
-    '#description' => t('The default Flickr User ID to be used when no user is specified. Tip: use !idGettr to find yours.', array('!idGettr' => l('idGettr.com', 'http://idgettr.com/'))),
+    '#description' => t(
+      'The default Flickr User ID to be used when no user is specified. Tip: use !idGettr to find yours.',
+      array('!idGettr' => l(t('idGettr.com'), 'http://idgettr.com/'))
+    ),
   );
 
   $times = array(900, 1800, 2700, 3600, 7200, 10800, 14400, 18000, 21600, 43200, 86400);
@@ -71,7 +73,7 @@ function flickrapi_admin_settings() {
     '#title' => t('Update interval'),
     '#options' => $ageoptions,
     '#default_value' => variable_get('flickrapi_cache_duration', 3600),
-    '#description' => t("The refresh interval indicating how often you want to check cached Flickr API calls are up to date."),
+    '#description' => t('The refresh interval indicating how often you want to check cached Flickr API calls are up to date.'),
   );
 
   $form['flickrcachepath'] = array(
@@ -113,7 +115,8 @@ function flickrapi_admin_settings_validate($form, &$form_state) {
 }
 
 /**
- * returns the phpFlickr object.
+ * Returns the phpFlickr object.
+ *
  * If we need to change anything, such as making the cache configuration,
  * then it'll all be done here.
  */
@@ -121,8 +124,8 @@ function flickrapi_phpFlickr() {
   $api_key = variable_get('flickrapi_api_key', '');
   if (!$api_key) {
     drupal_set_message(t("Flickr API key not set"), 'error');
-    if (user_access('Administer global flickr api settings')) {
-      drupal_set_message(t('Go to !link to configure the Flickr API settings', array('!link' => l('admin/config/media/flickrapi', 'admin/config/media/flickrapi'))));
+    if (user_access('configure flickr api')) {
+      drupal_set_message(t('Please !configure', array('!link' => l(t('configure the Flickr API settings'), 'admin/config/media/flickrapi'))));
     }
   }
   $flickr = new phpFlickr($api_key);
@@ -133,7 +136,7 @@ function flickrapi_phpFlickr() {
 /**
  * Tries to match an 'identifier' onto a flickr nsid
  *
- * This function will first see whether $identifier is allready
+ * This function will first see whether $identifier is already
  * a nsid (format check only, no api call).  If it is not and the
  * identifier has the format of an email, an api call will be made to
  * check whether there is an nsid for that email.  If this is not the
@@ -142,15 +145,15 @@ function flickrapi_phpFlickr() {
  *
  * If none of these succees, the result will be false
  *
- * @param $identifier
+ * @param Array $identifier
  *   identifier to find an nsid for
  *
- * @return
+ * @return String
  *   valid nsid or false if none can be found
  */
 function flickrapi_get_user_nsid($identifier) {
   if (flickrapi_is_nsid($identifier)) {
-    //identifier is an NSID
+    // Identifier is an NSID.
     return $identifier;
   }
   $f = flickrapi_phpFlickr();
@@ -164,6 +167,15 @@ function flickrapi_get_user_nsid($identifier) {
   return FALSE;
 }
 
+/**
+ * Do a preg_match to check if the given ID is a valid Flickr user ID.
+ *
+ * @param String $id
+ *   identifier to find an nsid for
+ *
+ * @return Boolean
+ *   TRUE/FALSE
+ */
 function flickrapi_is_nsid($id) {
-  return preg_match('/^\d+@N\d+$/', $id);
+  return preg_match('/^\d+@N\d+$/', $id) ? TRUE : FALSE;
 }

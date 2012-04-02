@@ -6,7 +6,8 @@
  */
 
 /**
- * Use the string 'configure flickr api' instead of configure_flickr_api for permissions.
+ * Use the string 'configure flickr api' instead of
+ * configure_flickr_api for permissions.
  */
 function flickrapi_update_7000() {
   db_update('role_permission')
