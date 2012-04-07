@@ -31,6 +31,7 @@ function flickrapi_update_7001() {
  * Clean up old variables.
  */
 function flickrapi_uninstall() {
+  variable_del('flickrapi_cache');
   variable_del('flickrapi_cache_path');
   variable_del('flickrapi_api_key');
   variable_del('flickrapi_api_secret');

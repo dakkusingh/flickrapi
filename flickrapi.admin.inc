@@ -11,18 +11,21 @@
 function flickrapi_admin_settings() {
   $form = array();
 
+  $api_key = variable_get('flickrapi_api_key', '');
   $form['flickrapi_api_key'] = array(
     '#type' => 'textfield',
     '#title' => t('API Key'),
     '#required' => TRUE,
-    '#default_value' => variable_get('flickrapi_api_key', ''),
-    '#description' => t('API Key from Flickr. !link', array(
-      '!link' => l(
-        t('Get one!'),
-        'http://www.flickr.com/services/apps/by/me'
-      ))
-    ),
+    '#default_value' => $api_key,
   );
+  if (empty($api_key)) {
+    $form['flickrapi_api_key']['#description'] = t('API Key from Flickr. !link', array(
+      '!link' => l(t('Get one!'), 'http://www.flickr.com/services/apps/by/me'))
+    );
+  }
+  else {
+    $form['flickrapi_api_key']['#description'] = t('API Key from Flickr.');
+  }
 
   $form['flickrapi_api_secret'] = array(
     '#type' => 'textfield',
@@ -35,12 +38,24 @@ function flickrapi_admin_settings() {
   $auth_token = variable_get('flickrapi_api_auth_token', '');
   if (empty($auth_token)) {
     $form['flickr_api_verified'] = array(
-      '#markup' => t('<label>OAuth verification status</label> Not verified. Save this settings form to verify your credentials.'),
+      'heading' => array('#markup' => t('<label>OAuth verification status</label>')),
+      'image' => array(
+        '#theme' => 'image',
+        '#path' => drupal_get_path('module', 'flickrapi') . '/images/false.png',
+        '#attributes' => array('style' => 'float: left; margin: 10px 10px 0 0; '),
+      ),
+      'text' => array('#markup' => '<p>' . t('Not verified yet') . '<br />' . t('Save this settings form to verify your credentials.') . '</p>'),
     );
   }
   else {
     $form['flickr_api_verified'] = array(
-      '#markup' => t('<label>OAuth verification status</label> Verified. !delete', array('!delete' => l(t('Delete access token'), 'admin/config/media/flickrapi/clear'))),
+      'heading' => array('#markup' => t('<label>OAuth verification status</label>')),
+      'image' => array(
+        '#theme' => 'image',
+        '#path' => drupal_get_path('module', 'flickrapi') . '/images/true.png',
+        '#attributes' => array('style' => 'float: left; margin: 10px 10px 0 0; '),
+      ),
+      'text' => array('#markup' => '<p>' . t('Verified') . '<br />' . l(t('Delete access token'), 'admin/config/media/flickrapi/clear') . '</p>'),
     );
   }
 
@@ -55,14 +70,13 @@ function flickrapi_admin_settings() {
     '#collapsible' => TRUE,
     '#collapsed' => (
       variable_get('flickrapi_access_permissions', array('read')) == 'read' &&
-      variable_get('flickrapi_cache_duration', array('read')) == 3600 &&
-      variable_get('flickrapi_cache_path', array('read')) == '/tmp'
+      variable_get('flickrapi_cache', TRUE) == TRUE
     ) ? TRUE : FALSE,
   );
 
   $form['advanced']['flickrapi_access_permissions'] = array(
     '#type' => 'radios',
-    '#title' => t('Flickr access permissions'),
+    '#title' => t('Flickr Access Permissions'),
     '#options' => array(
       'read' => t('Read only (default)'),
       'write' => t('Read & Write'),
@@ -72,20 +86,43 @@ function flickrapi_admin_settings() {
     '#default_value' => variable_get('flickrapi_access_permissions', array('read')),
   );
 
-  $form['advanced']['flickrapi_cache_duration'] = array(
-    '#type' => 'select',
-    '#title' => t('Update interval'),
-    '#options' => $ageoptions,
-    '#default_value' => variable_get('flickrapi_cache_duration', 3600),
-    '#description' => t('The refresh interval indicating how often you want to check cached Flickr API calls are up to date.'),
+  $form['advanced']['caching'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Cache settings'),
+    '#description' => t('Caching can improve page loading speeds for your users if you are calling the same Flickr requests frequently. You may want to disable it for testing, to save on your own bandwidth costs, or if you have concerns about keeping images on your own server. Note that some Flickr methods enforce restrictions on the frequency with which they may be called, !documented.', array(
+      '!documented' => l(t('as per the documentation'), 'http://www.flickr.com/services/api/'),
+    )),
+    '#collapsible' => TRUE,
+  );
+  $form['advanced']['caching']['flickrapi_cache'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow Flickr API to store results on your server'),
+    '#default_value' => variable_get('flickrapi_cache', TRUE),
   );
 
-  $form['advanced']['flickrapi_cache_path'] = array(
+  $form['advanced']['caching']['flickrapi_cache_path'] = array(
     '#title' => t('Flickr Cache Path'),
-    '#required' => TRUE,
-    '#description' => t('Location on server file system where results of Flickr API calls can be cached.'),
+    '#description' => t('Location on the server file system where the results will be cached.'),
     '#type' => 'textfield',
     '#default_value' => variable_get('flickrapi_cache_path', '/tmp'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="flickrapi_cache"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+
+  $form['advanced']['caching']['flickrapi_cache_duration'] = array(
+    '#type' => 'select',
+    '#title' => t('Update Interval'),
+    '#options' => $ageoptions,
+    '#default_value' => variable_get('flickrapi_cache_duration', 3600),
+    '#description' => t('How often you want to check cached Flickr API calls are up to date?'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="flickrapi_cache"]' => array('checked' => TRUE),
+      ),
+    ),
   );
 
   $form['#validate'][] = 'flickrapi_admin_settings_validate';
@@ -102,7 +139,7 @@ function flickrapi_admin_settings() {
 function flickrapi_form_flickrapi_admin_settings_alter(&$form, &$form_state) {
   $auth_token = variable_get('flickrapi_api_auth_token', '');
   if (empty($auth_token)) {
-    $form['actions']['submit']['#value'] = t('Validate using OAuth');
+    $form['actions']['submit']['#value'] = t('Authorize using OAuth');
   }
 }
 
@@ -112,6 +149,7 @@ function flickrapi_form_flickrapi_admin_settings_alter(&$form, &$form_state) {
 function flickrapi_admin_settings_validate($form, &$form_state) {
   $key = trim($form_state['values']['flickrapi_api_key']);
   $secret = trim($form_state['values']['flickrapi_api_secret']);
+  $cache = $form_state['values']['flickrapi_cache'];
   $cache_dir = $form_state['values']['flickrapi_cache_path'];
 
   if ($key && (preg_match('/^[A-Fa-f\d]{32}$/', $key) != 1)) {
@@ -122,8 +160,8 @@ function flickrapi_admin_settings_validate($form, &$form_state) {
     form_set_error('flickrapi_api_secret', t('This does not appear to be a Flickr API secret.'));
   }
 
-  if (!file_prepare_directory($cache_dir)) {
-    form_set_error('flickrapi_cache_path', t('Folder does not exist or it is not writable.'));
+  if ($cache && !file_prepare_directory($cache_dir)) {
+    form_set_error('flickrapi_cache_path', t('Cache folder does not exist or it is not writable.'));
   }
 }
 
@@ -171,18 +209,21 @@ function flickrapi_oauth_authenticate() {
     }
     $sig_method = DrupalOAuthClient::signatureMethod();
     $client = new DrupalOAuthClient($consumer, NULL, $sig_method);
-
-    $request_token = $client->getRequestToken('http://www.flickr.com/services/oauth/request_token', array(
-      'callback' => $callback)
-    );
-    $request_token->write();
+    try {
+      if ($request_token = $client->getRequestToken('http://www.flickr.com/services/oauth/request_token', array('callback' => $callback))) {
+        $request_token->write();
+      }
+    }
+    catch (Exception $e) {
+      drupal_set_message(t('You API key and secret do not seem to match.'), 'error');
+      drupal_goto('admin/config/media/flickrapi');
+    }
 
     $auth_url = $client->getAuthorizationUrl(
-      'http://www.flickr.com/services/oauth/authorize',
-       array(
+      'http://www.flickr.com/services/oauth/authorize', array(
         'callback' => $callback,
         'params' => array(
-          'perms' => variable_get('flickrapi_access_permissions', array('read'))
+          'perms' => variable_get('flickrapi_access_permissions', array('read')),
         ),
       )
     );
