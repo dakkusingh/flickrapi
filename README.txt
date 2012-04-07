@@ -4,5 +4,3 @@ develop a new Flickr-based module.
 
 To use this module, or any Flickr services modules, you will need to obtain an
 API key from http://www.flickr.com/services/api
-
-This module is based on the Flickr module.
