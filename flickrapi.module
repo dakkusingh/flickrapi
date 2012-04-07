@@ -52,6 +52,13 @@ function flickrapi_permission() {
 }
 
 /**
+ * Implements hook_flush_caches().
+ */
+function flickrapi_flush_caches() {
+  flickrapi_phpFlickr(TRUE);
+}
+
+/**
  * Returns the phpFlickr object.
  *
  * If we need to change anything, such as making the cache configuration,
@@ -60,7 +67,7 @@ function flickrapi_permission() {
  * @return phpFlickr
  *   The phpFlickr object
  */
-function flickrapi_phpFlickr() {
+function flickrapi_phpFlickr($clear_cache = FALSE) {
   $api_key = variable_get('flickrapi_api_key', '');
   $api_secret = variable_get('flickrapi_api_secret', '');
   $cache = variable_get('flickrapi_cache', '');
@@ -79,7 +86,12 @@ function flickrapi_phpFlickr() {
 
   // Enable caching.
   if ($cache == TRUE) {
-    $flickr->enableCache('fs', $cache_dir);
+    if ($clear_cache == TRUE) {
+      $flickr->enableCache('fs', $cache_dir, 0);
+    }
+    else {
+      $flickr->enableCache('fs', $cache_dir);
+    }
   }
 
   return $flickr;
