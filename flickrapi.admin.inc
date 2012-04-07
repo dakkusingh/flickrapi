@@ -104,7 +104,7 @@ function flickrapi_admin_settings() {
     '#title' => t('Flickr Cache Path'),
     '#description' => t('Location on the server file system where the results will be cached.'),
     '#type' => 'textfield',
-    '#default_value' => variable_get('flickrapi_cache_path', '/tmp'),
+    '#default_value' => variable_get('flickrapi_cache_path', variable_get('file_public_path', 'sites/default/files') . '/flickr'),
     '#states' => array(
       'visible' => array(
         ':input[name="flickrapi_cache"]' => array('checked' => TRUE),
