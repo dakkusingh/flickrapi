@@ -83,7 +83,7 @@ function flickrapi_admin_settings() {
       'delete' => t('Read, Write & Delete'),
     ),
     '#description' => t('If you change the access permissions after authentication, you need to re-authenticate your website.'),
-    '#default_value' => variable_get('flickrapi_access_permissions', array('read')),
+    '#default_value' => variable_get('flickrapi_access_permissions', 'read'),
   );
 
   $form['advanced']['caching'] = array(
