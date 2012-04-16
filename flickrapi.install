@@ -35,7 +35,10 @@ function flickrapi_uninstall() {
   variable_del('flickrapi_cache_path');
   variable_del('flickrapi_api_key');
   variable_del('flickrapi_api_secret');
-  variable_del('flickrapi_api_auth_token');
   variable_del('flickrapi_cache_duration');
   variable_del('flickrapi_default_nsid');
+  variable_del('flickrapi_access_permissions');
+  // flickrapi is disabled so we have to load it manually to use its functions.
+  module_load_include('module', 'flickrapi', 'flickrapi');
+  _flickrapi_oauth_clear();
 }

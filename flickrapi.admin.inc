@@ -35,8 +35,7 @@ function flickrapi_admin_settings() {
     '#description' => t("API key's secret from Flickr."),
   );
 
-  $auth_token = variable_get('flickrapi_api_auth_token', '');
-  if (empty($auth_token)) {
+  if (!_flickrapi_is_authenticated()) {
     $form['flickr_api_verified'] = array(
       'heading' => array('#markup' => t('<label>OAuth verification status</label>')),
       'image' => array(
@@ -137,8 +136,7 @@ function flickrapi_admin_settings() {
  * change the button text on the admin form.
  */
 function flickrapi_form_flickrapi_admin_settings_alter(&$form, &$form_state) {
-  $auth_token = variable_get('flickrapi_api_auth_token', '');
-  if (empty($auth_token)) {
+  if (!_flickrapi_is_authenticated()) {
     $form['actions']['submit']['#value'] = t('Authorize using OAuth');
   }
 }
@@ -172,13 +170,12 @@ function flickrapi_admin_settings_submit($form, &$form_state) {
   // If the Access Permissions have changed, we need to re-authenticate.
   if ($perm_element = $form_state['complete form']['advanced']['flickrapi_access_permissions']) {
     if ($perm_element['#value'] != $perm_element['#default_value']) {
-      variable_del('flickrapi_api_auth_token');
+      _flickrapi_oauth_clear();
     }
   }
 
   // Validate the credentials on Flickr.
-  $auth_token = variable_get('flickrapi_api_auth_token', '');
-  if (empty($auth_token)) {
+  if (!_flickrapi_is_authenticated()) {
     $form_state['redirect'] = 'admin/config/media/flickrapi/authenticate';
   }
 }
@@ -216,6 +213,8 @@ function flickrapi_oauth_authenticate() {
     }
     catch (Exception $e) {
       drupal_set_message(t('You API key and secret do not seem to match.'), 'error');
+      variable_del('flickrapi_api_key');
+      variable_del('flickrapi_api_secret');
       drupal_goto('admin/config/media/flickrapi');
     }
 
@@ -251,7 +250,6 @@ function flickrapi_oauth_token_verify() {
     'verifier' => $_GET['oauth_verifier'])
   );
 
-  variable_set('flickrapi_api_auth_token', $access_token);
   $request_token->delete();
 
   drupal_set_message(t('Succesfully verified'));
@@ -262,7 +260,10 @@ function flickrapi_oauth_token_verify() {
  * Delete locally saved OAuth token.
  */
 function flickrapi_oauth_clear() {
-  drupal_set_message(t('Flickr authentication token is deleted.'));
-  variable_del('flickrapi_api_auth_token');
+  if (_flickrapi_oauth_clear()) {
+    drupal_set_message(t('Flickr authentication token was deleted.'));
+  } else {
+    drupal_set_message(t('Flickr authentication token was not found.', 'error'));
+  }
   drupal_goto('admin/config/media/flickrapi');
 }

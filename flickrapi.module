@@ -177,3 +177,38 @@ function flickrapi_get_user_nsid($identifier) {
 function flickrapi_is_nsid($id) {
   return preg_match('/^\d+@N\d+$/', $id) ? TRUE : FALSE;
 }
+
+/**
+ * Checks if a Flickr account has been already authenticated
+ *
+ * @return Boolean
+ *   TRUE if the consumer key and consumer secret tokens were found
+ */
+function _flickrapi_is_authenticated() {
+  return variable_get('flickrapi_api_key', '') && variable_get('flickrapi_api_secret', '');
+}
+
+/**
+ * Clears OAuth token and keys
+ *
+ * @return Boolean
+ *   TRUE if keys and oauth token were found
+ */
+function _flickrapi_oauth_clear() {
+  $consumer_key = variable_get('flickrapi_api_key');
+  $secret = variable_get('flickrapi_api_secret');
+  // TODO get rid of this query and use an oauth_common API method when available
+  $csid = db_query("SELECT csid FROM {oauth_common_consumer} WHERE consumer_key = :consumer_key AND secret = :secret", array(
+    ':consumer_key' => $consumer_key,
+    ':secret' => $secret,
+    )
+  )->fetchField();
+  if ($csid) {
+    DrupalOAuthConsumer::deleteConsumer($csid);
+    variable_del('flickrapi_api_key');
+    variable_del('flickrapi_api_secret');
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
