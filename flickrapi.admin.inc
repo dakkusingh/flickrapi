@@ -170,7 +170,7 @@ function flickrapi_admin_settings_submit($form, &$form_state) {
   // If the Access Permissions have changed, we need to re-authenticate.
   if ($perm_element = $form_state['complete form']['advanced']['flickrapi_access_permissions']) {
     if ($perm_element['#value'] != $perm_element['#default_value']) {
-      _flickrapi_oauth_clear();
+      //_flickrapi_oauth_clear();
     }
   }
 
@@ -257,13 +257,27 @@ function flickrapi_oauth_token_verify() {
 }
 
 /**
- * Delete locally saved OAuth token.
+ * Form builder: confirm to delete OAuth authentication token.
  */
-function flickrapi_oauth_clear() {
+function flickrapi_oauth_clear_form($form, &$form_state) {
+  return confirm_form(
+    $form,
+    t('Are you sure you want to delete the Flickr access token?'),
+    'admin/config/media/flickrapi',
+    t('This action can not be undone.'),
+    t('Delete Flickr access token'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Form submit: deletes flickr credentials
+ */
+function flickrapi_oauth_clear_form_submit($form, &$form_state) {
   if (_flickrapi_oauth_clear()) {
-    drupal_set_message(t('Flickr authentication token was deleted.'));
+    drupal_set_message(t('Flickr access token was deleted.'));
   } else {
-    drupal_set_message(t('Flickr authentication token was not found.', 'error'));
+    drupal_set_message(t('Flickr access token was not found.'), 'error');
   }
-  drupal_goto('admin/config/media/flickrapi');
+  $form_state['redirect'] = 'admin/config/media/flickrapi';
 }

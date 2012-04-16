@@ -33,7 +33,8 @@ function flickrapi_menu() {
   $items['admin/config/media/flickrapi/clear'] = array(
     'title' => 'Clear Flickr Credentials',
     'access arguments' => array('configure flickr api'),
-    'page callback' => 'flickrapi_oauth_clear',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrapi_oauth_clear_form'),
     'file' => 'flickrapi.admin.inc',
   );
   return $items;
