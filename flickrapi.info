@@ -3,7 +3,7 @@ description = Use Flickr APIs with Drupal using phpFlickr.
 package = Media
 core = 7.x
 
-files[] = phpFlickr/phpFlickr.php
 dependencies[] = oauth_common
+dependencies[] = libraries
 
 configure = admin/config/media/flickrapi
