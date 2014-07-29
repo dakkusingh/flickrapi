@@ -92,6 +92,8 @@ function flickrapi_admin_settings_validate($form, &$form_state) {
  * then it'll all be done here.
  */
 function flickrapi_phpFlickr() {
+  module_load_include('php', 'flickrapi', 'phpFlickr/phpFlickr');
+
   $api_key = variable_get('flickrapi_api_key', '');
   $api_secret = variable_get('flickrapi_api_secret', '');
   if (!$api_key) {
